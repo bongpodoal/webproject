@@ -1,6 +1,8 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from django.views.generic import CreateView, UpdateView
 from .models import Post
 from .forms import PostForm
@@ -22,6 +24,17 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     return render(request, "blog/post_detail.html", {"post" : post})
 
+def signup(request):
+    if request.method == "GET":
+        form = UserCreationForm()
+        return render(request, "registration/signup.html", {"form":form})
+
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+        user = form.save()
+        login(request, user)
+        return redirect("post_list")
+    return render(request, "registration/signup.html", {"form":form})
 
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk)
