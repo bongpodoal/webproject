@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>삭제 확인</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --line: rgba(255,255,255,.12);
+      --danger:#ff4d6d;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 760px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(255,77,109,.22), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(124,92,255,.18), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:28px 18px 60px; }
+    .panel{
+      padding:20px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .title{
+      margin:0;
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+    .desc{
+      margin:12px 0 0;
+      color: rgba(255,255,255,.80);
+      line-height:1.7;
+    }
+    .postname{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      font-weight:800;
+    }
+    .actions{
+      margin-top:16px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      font-weight:800;
+      font-size:13.5px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+      cursor:pointer;
+      color: var(--text);
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
+    .btn.danger{
+      border-color: rgba(255,77,109,.55);
+      background: linear-gradient(180deg, rgba(255,77,109,.35), rgba(255,77,109,.18));
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1 class="title">삭제 확인</h1>
+      <p class="desc">
+        정말로 <span class="postname">"{{ post.title }}"</span> 게시물을 삭제할까요?
+        <br><span style="color:rgba(255,255,255,.60); font-size:13px;">삭제 후에는 되돌릴 수 없습니다.</span>
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="actions">
+          <a class="btn" href="{% url 'post_list' %}">취소</a>
+          <button class="btn danger" type="submit">삭제</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

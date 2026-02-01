@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ post.title }}</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel: rgba(255,255,255,.06);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --line: rgba(255,255,255,.12);
+      --accent: #7c5cff;
+      --danger: #ff4d6d;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 900px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(124,92,255,.28), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(255,77,109,.18), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:28px 18px 60px; }
+    .panel{
+      padding:20px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .crumbs{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:12px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      font-weight:800;
+      font-size:13.5px;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
+    .btn.primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(180deg, rgba(124,92,255,.45), rgba(124,92,255,.22));
+    }
+    .btn.danger{
+      border-color: rgba(255,77,109,.50);
+      background: linear-gradient(180deg, rgba(255,77,109,.35), rgba(255,77,109,.18));
+    }
+    .title{
+      margin:0;
+      font-size:28px;
+      font-weight:900;
+      letter-spacing:-.03em;
+      line-height:1.2;
+    }
+    .meta{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .content{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.85);
+      font-size:15.5px;
+      line-height:1.75;
+      white-space: pre-wrap; /* 줄바꿈 유지 */
+    }
+    .actions{
+      margin-top:18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="crumbs">
+        <a class="btn" href="{% url 'post_list' %}">← 목록</a>
+        <div class="actions">
+          <a class="btn primary" href="{% url 'post_edit' post.pk %}">수정</a>
+          <a class="btn danger" href="{% url 'post_delete' post.pk %}">삭제</a>
+        </div>
+      </div>
+
+      <h1 class="title">{{ post.title }}</h1>
+      <div class="meta">
+        <span class="badge">🗓️ {{ post.created_at }}</span>
+      </div>
+
+      <div class="content">{{ post.content }}</div>
+    </div>
+  </div>
+</body>
+</html>
