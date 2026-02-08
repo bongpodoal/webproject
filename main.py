@@ -1,5 +1,23 @@
-n = int(input())
-for i in range(1, n+1):
-    print(('*' * i) + ' '*(n-i) + ' '*(n-i) + ('*' * i))
-for j in range(n-1, 0, -1):
-    print(('*'*j) + ' '*(n-j) + ' '*(n-j) + ('*'*j))
+N = int(input())
+
+init = ['***','* *','***']
+def star(n = 3, arr = init):
+    if n == N:
+        return arr
+
+    Li = []
+    for i in range(n):
+        Li.append(arr[i] * 3)
+
+    for i in range(n):
+        Li.append(arr[i] + ' ' * n + arr[i])
+
+    for i in range(n):
+        Li.append(arr[i] * 3)
+
+    return star(n * 3, Li)
+
+res = star(3, init)
+
+for j in res:
+    print(j)

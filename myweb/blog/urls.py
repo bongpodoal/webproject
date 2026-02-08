@@ -7,4 +7,6 @@ urlpatterns = [
     path("<int:pk>/edit/", views.post_edit, name="post_edit"),
     path("<int:pk>/delete/", views.post_delete, name="post_delete"),
     path("signup/", views.signup, name="signup"),
+    path("commtents/<int:pk>/edit", views.comment_edit, name="comment_edit"),
+    path("commtents/<int:pk>/delete", views.comment_delete, name="comment_delete"),
 ]
