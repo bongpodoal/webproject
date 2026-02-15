@@ -4,13 +4,16 @@ from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.views.generic import CreateView, UpdateView
-from .models import Post, Comment
-from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
+from .models import Post, Comment
+from .forms import PostForm, CommentForm, ProfileForm
+
+
 def post_list(request):
-    posts = Post.objects.order_by('-id')
-    return render(request, 'blog/post_list.html', {'posts' : posts})
+    posts = Post.objects.order_by("-id")
+    return render(request, "blog/post_list.html", {"posts": posts})
+
 
 @login_required
 def post_delete(request, pk):
@@ -26,8 +29,10 @@ def post_delete(request, pk):
         post.delete()
         return redirect("post_list")
 
+
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
+
     comments = post.comments.select_related("author").all()
 
     if request.method == "POST":
@@ -35,6 +40,7 @@ def post_detail(request, pk):
             return redirect("login")
 
         comment_form = CommentForm(request.POST)
+
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.post = post
@@ -42,32 +48,33 @@ def post_detail(request, pk):
             comment.save()
 
             return redirect("post_detail", pk=post.pk)
-        else:
-            comment_form = CommentForm()
 
         return render(
             request,
             "blog/post_detail.html",
-            {"post" : post, "comments" : comments, "comment_form": comment_form},
+            {"post": post, "comments": comments, "comment_form": comment_form},
         )
 
-
-    return render(request, "blog/post_detail.html", {"post" : post})
-
-
+    comment_form = CommentForm()
+    return render(
+        request,
+        "blog/post_detail.html",
+        {"post": post, "comments": comments, "comment_form": comment_form},
+    )
 
 
 def signup(request):
     if request.method == "GET":
         form = UserCreationForm()
-        return render(request, "registration/signup.html", {"form":form})
+        return render(request, "registration/signup.html", {"form": form})
 
     form = UserCreationForm(request.POST)
     if form.is_valid():
         user = form.save()
         login(request, user)
         return redirect("post_list")
-    return render(request, "registration/signup.html", {"form":form})
+    return render(request, "registration/signup.html", {"form": form})
+
 
 @login_required
 def post_edit(request, pk):
@@ -96,26 +103,33 @@ class PostUpdate(UpdateView):
     def get_success_url(self):
         return reverse_lazy("post_detail", kwargs={"pk": self.object.pk})
 
+
 class PostCreate(CreateView):
     model = Post
     form_class = PostForm
     template_name = "blog/post_form.html"
     success_url = reverse_lazy("post_list")
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        form.instance.author = self.request.user   # ✅ author 자동 채움
+        form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 @login_required
 def comment_edit(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
     if comment.author != request.user:
-        raise PermissionError
+        return HttpResponseForbidden("수정 권한이 없습니다.")
 
     if request.method == "GET":
         form = CommentForm(instance=comment)
-        return render(request, "blog/comment_form.html", {"form": form, "comment" : comment})
+        return render(request, "blog/comment_form.html", {"form": form, "comment": comment})
 
     form = CommentForm(request.POST, instance=comment)
     if form.is_valid():
@@ -124,11 +138,13 @@ def comment_edit(request, pk):
 
     return render(request, "blog/comment_form.html", {"form": form, "comment": comment})
 
+
+@login_required
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
 
     if comment.author != request.user:
-        raise PermissionError
+        return HttpResponseForbidden("삭제 권한이 없습니다.")
 
     if request.method == "GET":
         return render(request, "blog/comment_delete.html", {"comment": comment})
@@ -137,4 +153,18 @@ def comment_delete(request, pk):
         post_pk = comment.post.pk
         comment.delete()
         return redirect("post_detail", pk=post_pk)
-# templates
+
+
+def profile_detail(request, username):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        form = ProfileForm
+        if form.is_valid():
+            form.save()
+            return redirect("profile_detail", username=request.user.username)
+
+    else:
+        form = ProfileForm(instance=profile)
+
+    return render(request, "blog/profile_edit.html", {"form" : form})

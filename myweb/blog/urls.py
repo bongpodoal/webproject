@@ -9,4 +9,7 @@ urlpatterns = [
     path("signup/", views.signup, name="signup"),
     path("commtents/<int:pk>/edit", views.comment_edit, name="comment_edit"),
     path("commtents/<int:pk>/delete", views.comment_delete, name="comment_delete"),
+    path("profiles/<str:username>/", views.profile_detail, name="profile_detail"),
+    path("profiles/edit/", views.profile_edit, name="profile_edit"),
+
 ]
