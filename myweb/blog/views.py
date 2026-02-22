@@ -6,13 +6,25 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, get_user_model
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
-from .models import Post, Comment, Profile
+from .models import Post, Comment, Profile, Tag
 from .forms import PostForm, CommentForm, ProfileForm
 
 
 def post_list(request):
-    posts = Post.objects.order_by("-id")
+    q = (request.GET.get("q") or "").strip()
+    tag_name = (request.GET.get("tag") or "").strip()
+    posts = (
+        Post.objects.select_related("author").prefetch_related("tags").order_by("-id")
+    )
+    if q:
+        posts = posts.filter(Q(title_icontain=q) | Q(content__icontain=q))
+    if tag_name:
+        posts = posts.filter(tag__name=tag_name)
+
+    tags = Tag.objects.all()
+
     return render(request, "blog/post_list.html", {"posts": posts})
 
 

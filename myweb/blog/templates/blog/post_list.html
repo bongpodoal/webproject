@@ -47,6 +47,14 @@
     {{ post.content }}
     <br>
     <small>{{ post.created_at }}</small>
+    <div>
+      <small>태그 : </small>
+      {% for t in post.tags.all %}
+        <a href="% url 'post_list' %}?tag={{ t.name }}">{{ t.name }}</a>
+      {% empty %}
+        <small>없음</small>
+      {% endfor %}
+    </div>
     <br>
 
     {% if post.author %}
