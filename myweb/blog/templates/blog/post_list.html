@@ -5,6 +5,20 @@
   <title>게시물 목록</title>
 </head>
 <body>
+
+{% if user.is_authenticated %}
+  <div style="position: absolute; top: 10px; right: 10px;">
+    <a href="{% url 'profile_detail' user.username %}">
+      {% if user.profile and user.profile.image %}
+        <img src="{{ user.profile.image.url }}" alt="profile" width="32" height="32">
+      {% else %}
+        <img src="/media/profiles/unset.png" alt="profile" width="32" height="32">
+      {% endif %}
+      {{ user.username }}
+    </a>
+  </div>
+{% endif %}
+
 <h1>게시물 목록</h1>
 
 {% if user.is_authenticated %}
@@ -34,14 +48,23 @@
     <br>
     <small>{{ post.created_at }}</small>
     <br>
-    <small>{{ post.author.username }}</small>
+
+    {% if post.author %}
+      <a href="{% url 'profile_detail' post.author.username %}">
+        {% if post.author.profile and post.author.profile.image %}
+          <img src="{{ post.author.profile.image.url }}" alt="profile" width="32" height="32">
+        {% else %}
+          <img src="/media/profiles/unset.png" alt="profile" width="32" height="32">
+        {% endif %}
+        <strong>{{ post.author.username }}</strong>
+      </a>
+    {% endif %}
   </li>
   <hr>
   {% empty %}
   <li>게시글이 없습니다.</li>
   {% endfor %}
 </ul>
-
 
 </body>
 </html>

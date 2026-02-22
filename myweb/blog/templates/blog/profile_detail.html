@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ target_user.username }}의 프로필</title>
+</head>
+<body>
+    <h1>{{ target_user.username }}의 프로필</h1>
+
+    {% if profile.image %}
+        <p><img src="{{ profile.image.url }}" alt="profile" width="120" height="120"></p>
+    {% else %}
+        <p><img src="/media/profiles/unset.png" alt="profile" width="120" height="120"></p>
+    {% endif %}
+
+    {% if profile.bio %}
+        <p>{{ profile.bio }}</p>
+    {% else %}
+        <p>소개글이 없습니다.</p>
+    {% endif %}
+
+    {% if user.is_authenticated and user == target_user %}
+        <p>
+            <a href="{% url 'profile_edit' %}">내 프로필 수정</a>
+        </p>
+    {% endif %}
+
+    <a href="{% url 'post_list' %}">목록으로</a>
+</body>
+</html>

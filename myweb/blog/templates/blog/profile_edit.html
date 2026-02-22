@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>프로필 수정</title>
+</head>
+<body>
+  <h1>프로필 수정</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button type="submit">저장</button>
+  </form>
+
+  <p>
+    <a href="{url 'profile_detail' user.username %}">취소</a>
+  </p>
+</body>
+</html>

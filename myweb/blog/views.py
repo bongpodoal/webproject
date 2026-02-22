@@ -1,12 +1,13 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
 
-from .models import Post, Comment
+from .models import Post, Comment, Profile
 from .forms import PostForm, CommentForm, ProfileForm
 
 
@@ -147,7 +148,7 @@ def comment_delete(request, pk):
         return HttpResponseForbidden("삭제 권한이 없습니다.")
 
     if request.method == "GET":
-        return render(request, "blog/comment_delete.html", {"comment": comment})
+        return render(request, "blog/comment_confirm_delete.html", {"comment": comment})
 
     if request.method == "POST":
         post_pk = comment.post.pk
@@ -155,16 +156,33 @@ def comment_delete(request, pk):
         return redirect("post_detail", pk=post_pk)
 
 
+User = get_user_model()
+
+
 def profile_detail(request, username):
-    profile = request.user.profile
+    target_user = get_object_or_404(User, username=username)
+
+    # ✅ 없으면 자동 생성해서 "User has no profile" 방지
+    profile, _ = Profile.objects.get_or_create(user=target_user)
+
+    return render(request, "blog/profile_detail.html", {
+        "target_user": target_user,
+        "profile": profile,
+    })
+
+
+@login_required
+def profile_edit(request):
+
+    profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        form = ProfileForm
+
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             return redirect("profile_detail", username=request.user.username)
-
     else:
         form = ProfileForm(instance=profile)
 
-    return render(request, "blog/profile_edit.html", {"form" : form})
+    return render(request, "blog/profile_form.html", {"form": form})

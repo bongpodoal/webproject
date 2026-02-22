@@ -12,7 +12,12 @@
     <small>작성일 : {{ post.created_at }}</small>
     {% if post.author %}
       <br>
-      <small>작성자 : {{ post.author.username }}</small>
+    <strong>
+      <a href="{% url 'profile_detail' post.author.username %}">
+      <img src="{{ user.profile.image.url }}" alt="profile" width="32" height="32">
+      {{ post.author.username }}
+      </a>
+    </strong>
     {% endif %}
   </p>
 

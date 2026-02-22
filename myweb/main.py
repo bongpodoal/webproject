@@ -1,3 +1,8 @@
-n = int(input())
-for i in range(1, n+1):
-    print("Case #" + i)
+A, B ,V = map(int, input().split())
+
+res = (V - B) / (A - B)
+
+if res == int(res):
+    print(int(res))
+else:
+    print(int(res) + 1)
