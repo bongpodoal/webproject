@@ -8,7 +8,7 @@ from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from .models import Post, Comment, Profile, Tag
+from .models import Post, Comment, Profile, Tag, PostVote, CommentVote
 from .forms import PostForm, CommentForm, ProfileForm
 
 
@@ -45,8 +45,15 @@ def post_delete(request, pk):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-
+    post_up = post.votes.filter(value=1).count()
+    post_down = post.votes.filter(value=-1).count()
     comments = post.comments.select_related("author").all()
+    comment_up = {}
+    comment_down = {}
+    comment_form = CommentForm()
+    for c in comments:
+        comment_up[c.id] = c.votes.filter(value=1).count()
+        comment_down[c.id] = c.votes.filter(value=-1).count()
 
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -65,14 +72,26 @@ def post_detail(request, pk):
         return render(
             request,
             "blog/post_detail.html",
-            {"post": post, "comments": comments, "comment_form": comment_form},
+            {"post": post,
+             "comments": comments,
+             "comment_form": comment_form,
+             "post_up": post_up,
+             "post_down": post_down,
+             "comment_up": comment_up,
+             "comment_down": comment_down,
+             },
         )
 
     comment_form = CommentForm()
     return render(
         request,
         "blog/post_detail.html",
-        {"post": post, "comments": comments, "comment_form": comment_form},
+        {"post": post,
+         "comments": comments,
+         "comment_form": comment_form,
+         "post_up": post_up, "post_down": post_down,
+         "comment_up": comment_up,
+          "comment_down": comment_down,},
     )
 
 
@@ -198,3 +217,57 @@ def profile_edit(request):
         form = ProfileForm(instance=profile)
 
     return render(request, "blog/profile_form.html", {"form": form})
+
+def post_vote(request, pk, direction):
+
+    post = get_object_or_404(Post, pk=pk)
+
+    if direction not in ("up", "down"):
+        return HttpResponseForbidden("잘못된 요청입니다.")
+
+    new_value = 1 if direction == "up" else -1
+
+    vote = PostVote.objects.filter(post=post, user=request.user).first()
+
+    if vote:
+        if vote.value == new_value:
+            vote.delete()
+
+        else:
+            vote.value = new_value
+            vote.save()
+    else:
+        PostVote.objects.create(
+            post=post,
+            user=request.user,
+            value=new_value,
+        )
+
+    return redirect("post_detail", pk=post.pk)
+
+
+def comment_vote(request, pk, direction):
+    comment = get_object_or_404(Comment, pk=pk)
+
+    if direction not in ("up", "down"):
+        return HttpResponseForbidden("잘못된 요청입니다.")
+
+    new_value = 1 if direction == "up" else -1
+
+    vote = CommentVote.objects.filter(comment=comment, user=request.user).first()
+
+    if vote:
+        if vote.value == new_value:
+            vote.delete()
+
+        else:
+            vote.value = new_value
+            vote.save()
+    else:
+        CommentVote.objects.create(
+            comment=comment,
+            user=request.user,
+            value=new_value,
+        )
+
+    return redirect("post_detail", pk=comment.post.pk)

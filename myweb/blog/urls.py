@@ -11,5 +11,15 @@ urlpatterns = [
     path("commtents/<int:pk>/delete", views.comment_delete, name="comment_delete"),
     path("profiles/edit/", views.profile_edit, name="profile_edit"),
     path("profiles/<str:username>/", views.profile_detail, name="profile_detail"),
+    path(
+        "<int:pk>/vote/<str:direction>/",
+        views.post_vote,
+        name="post_vote",
+    ),
+    path(
+        "comments/<int:pk>/vote/<str:direction>/",
+        views.comment_vote,
+        name="comment_vote",
+    ),
 
 ]
